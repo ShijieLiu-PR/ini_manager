@@ -1,6 +1,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 #include "../include/ini_manager.h"
 
 namespace ini{
@@ -51,10 +52,24 @@ void Section::AppendComment(std::string comment)
     }
 }
 
-
 size_t Section::Size()
 {
     return key_map_.size();
+}
+
+double Section::ToDouble(std::string name)
+{
+    if(IsKeyExist(name)){
+        return std::stof(key_map_[name].value);
+    }
+    return 0.0;
+}
+
+double Section::ToInt(std::string name){
+    if(IsKeyExist(name)){
+        return std::stoi(key_map_[name].value);
+    }
+    return 0;
 }
 
 //key operations
@@ -73,6 +88,12 @@ std::string Section::GetKeyValue(std::string name)
 std::string Section::GetkeyComment(std::string name)
 {
     return key_map_[name].comment;
+}
+void Section::GetKeyNames(std::vector<std::string>& vec){
+    KeyMap::iterator it;
+    for (it = key_map_.begin(); it != key_map_.end();it++){
+        vec.push_back(it->first);
+    }
 }
 void Section::SetKeyValue(std::string name, std::string value)
 {
@@ -220,6 +241,25 @@ void Ini_Manager::ExportIniFile(){
     }
 }
 
+//get all section names in this manager
+void Ini_Manager::GetSectionNames(std::vector<std::string>& vec)
+{
+    SectionMapIter it;
+    for (it = section_map_.begin(); it != section_map_.end();it++)
+    {
+        vec.push_back(it->first);
+    }
+}
+
+size_t Ini_Manager::Size()
+{
+    return section_map_.size();
+}
+bool Ini_Manager::IsSectionExist(std::string sec_name)
+{
+    return section_map_.count(sec_name) > 0;
+}
+
 void Ini_Manager::TrimWhiteSpace(std::string& str, bool left, bool right)
 {
     char white_space[] = " \r\n\t\v";
@@ -232,7 +272,6 @@ void Ini_Manager::TrimWhiteSpace(std::string& str, bool left, bool right)
         str.erase(str.find_last_not_of(white_space) + 1, str.size() - str.find_last_not_of(white_space) - 1);
     }
 }
-
 
 LineType Ini_Manager::CheckLineType(std::string& str)
 {

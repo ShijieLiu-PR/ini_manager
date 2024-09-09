@@ -49,9 +49,12 @@ public:
     void AddKey(std::string name, std::string value, std::string comment = "");
     std::string GetKeyValue(std::string name);
     std::string GetkeyComment(std::string name);
+    void GetKeyNames(std::vector<std::string>& vec);
     void SetKeyValue(std::string name, std::string value);
     void SetKeyComment(std::string name, std::string comment);
     bool IsKeyExist(std::string name);
+    double ToDouble(std::string name);
+    double ToInt(std::string name);
     //format section into string
     std::string FormatSection();
     //operator[]
@@ -69,8 +72,6 @@ private:
     std::string ini_file_path_;
     SectionMap section_map_;
 
-
-
 public:
     //constructor
     Ini_Manager(std::string path);
@@ -79,6 +80,9 @@ public:
     //method
     void ImportIniFile();
     void ExportIniFile();
+    void GetSectionNames(std::vector<std::string>& vec);
+    size_t Size();
+    bool IsSectionExist(std::string sec_name);
     static void TrimWhiteSpace(std::string& str, bool left = true, bool right = true);
 
     //Parse line type, for example, comment, section, key, and others which will be ignored

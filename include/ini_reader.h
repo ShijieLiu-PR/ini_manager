@@ -1,5 +1,5 @@
-#ifndef INCLUDE_INI_MANAGER_H
-#define INCLUDE_INI_MANAGER_H
+#ifndef INCLUDE_INI_READER_H
+#define INCLUDE_INI_READER_H
 
 #include <iostream>
 #include <string>
@@ -37,6 +37,7 @@ private:
 public:
     Section();
     Section(std::string name, std::string comment = "");
+    Section(const Section &obj);
     ~Section();
     void SetName(std::string name);
     std::string GetName();
@@ -60,23 +61,24 @@ public:
     //operator[]
     std::string operator[](std::string name);
     //operator=
-    Section &operator=(Section& setion);
+    Section& operator=(Section& setion);
 };
 
 // define section map
 typedef std::map<std::string, Section *> SectionMap;
 typedef std::map<std::string, Section *>::iterator SectionMapIter;
 
-class Ini_Manager{
+class Ini_Reader{
 private:
     std::string ini_file_path_;
     SectionMap section_map_;
 
 public:
     //constructor
-    Ini_Manager(std::string path);
+    Ini_Reader(std::string path);
+    Ini_Reader(Ini_Reader &obj);
     //destructor
-    ~Ini_Manager();
+    ~Ini_Reader();
     //method
     void ImportIniFile();
     void ExportIniFile();
@@ -93,6 +95,8 @@ public:
     Section& GetSection(std::string sec_name);
     //operator[]
     Section& operator[](std::string name);
+    //operator=
+    Ini_Reader& operator=(const Ini_Reader &obj);
 };
 
 }//namespace ini

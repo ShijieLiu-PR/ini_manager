@@ -2,7 +2,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include "../include/ini_manager.h"
+#include "../include/ini_reader.h"
 
 namespace ini{
 
@@ -13,6 +13,14 @@ namespace ini{
 //constructor
 Section::Section():name_(""),comment_(""){}
 Section::Section(std::string name, std::string comment) : name_(name), comment_(comment) {}
+
+//copy constructor
+Section::Section(const Section& obj)
+{
+    name_ = obj.name_;
+    comment_ = obj.comment_;
+    key_map_ = obj.key_map_;
+}
 
 //destructor
 Section::~Section()
@@ -144,14 +152,21 @@ Section& Section::operator=(Section& section)
 }
 
 // #######################################################################################
-// Class Ini_Manager
+// Class Ini_Reader
 // #######################################################################################
 
 // constructor
-Ini_Manager::Ini_Manager(std::string path) : ini_file_path_(path) {};
+Ini_Reader::Ini_Reader(std::string path) : ini_file_path_(path) {};
+Ini_Reader::Ini_Reader(Ini_Reader& obj){
+    ini_file_path_ = obj.ini_file_path_;
+    SectionMapIter it;
+    for (it = obj.section_map_.begin(); it != obj.section_map_.end();it++){
+        section_map_[it->first] = new Section(*(it->second));
+    }
+}
 
 //deconstructor
-Ini_Manager::~Ini_Manager()
+Ini_Reader::~Ini_Reader()
 {
     ini_file_path_.clear();
     SectionMapIter iter;
@@ -161,20 +176,19 @@ Ini_Manager::~Ini_Manager()
     }
 }
 
-
 //insert a new section
-void Ini_Manager::InsertSection(Section* ptr)
+void Ini_Reader::InsertSection(Section* ptr)
 {
     section_map_[ptr->GetName()] = ptr;
 }
 
-Section& Ini_Manager::GetSection(std::string sec_name)
+Section& Ini_Reader::GetSection(std::string sec_name)
 {
     return *section_map_[sec_name];
 }
 
 //import ini file
-void Ini_Manager::ImportIniFile()
+void Ini_Reader::ImportIniFile()
 {
     std::fstream fs;
     fs.open(ini_file_path_,std::ios::in);
@@ -232,7 +246,7 @@ void Ini_Manager::ImportIniFile()
 }
 
 //void export ini file
-void Ini_Manager::ExportIniFile(){
+void Ini_Reader::ExportIniFile(){
     std::string sec_str;
     SectionMapIter it = section_map_.begin();
     for (; it != section_map_.end();it++)
@@ -242,7 +256,7 @@ void Ini_Manager::ExportIniFile(){
 }
 
 //get all section names in this manager
-void Ini_Manager::GetSectionNames(std::vector<std::string>& vec)
+void Ini_Reader::GetSectionNames(std::vector<std::string>& vec)
 {
     SectionMapIter it;
     for (it = section_map_.begin(); it != section_map_.end();it++)
@@ -251,16 +265,16 @@ void Ini_Manager::GetSectionNames(std::vector<std::string>& vec)
     }
 }
 
-size_t Ini_Manager::Size()
+size_t Ini_Reader::Size()
 {
     return section_map_.size();
 }
-bool Ini_Manager::IsSectionExist(std::string sec_name)
+bool Ini_Reader::IsSectionExist(std::string sec_name)
 {
     return section_map_.count(sec_name) > 0;
 }
 
-void Ini_Manager::TrimWhiteSpace(std::string& str, bool left, bool right)
+void Ini_Reader::TrimWhiteSpace(std::string& str, bool left, bool right)
 {
     char white_space[] = " \r\n\t\v";
     if(left)
@@ -273,7 +287,7 @@ void Ini_Manager::TrimWhiteSpace(std::string& str, bool left, bool right)
     }
 }
 
-LineType Ini_Manager::CheckLineType(std::string& str)
+LineType Ini_Reader::CheckLineType(std::string& str)
 {
     //empty line is a carriage return
     if(str.size()==0)
@@ -292,9 +306,19 @@ LineType Ini_Manager::CheckLineType(std::string& str)
 }
 
 //operator[]
-Section& Ini_Manager::operator[](std::string name)
+Section& Ini_Reader::operator[](std::string name)
 {
     return *section_map_[name];
+}
+//operator=
+Ini_Reader& Ini_Reader::operator=(const Ini_Reader& obj)
+{
+    ini_file_path_ = obj.ini_file_path_;
+    SectionMapIter it = section_map_.begin();
+    for (; it != section_map_.end();it++){
+        
+    }
+        return *this;
 }
 
 

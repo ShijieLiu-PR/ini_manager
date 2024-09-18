@@ -1,24 +1,27 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "./include/ini_manager.h"
+#include "./include/ini_reader.h"
 
 int main(int argc, char* argv[])
 {
     std::string ini_path = "test\\config file.ini";
-    ini::Ini_Manager ini_mgr(ini_path);
+    ini::Ini_Reader ini_mgr(ini_path);
     ini_mgr.ImportIniFile();
-    std::cout << ini_mgr["Function"]["Idd_Target_1P8V"] << std::endl;
-    size_t count = ini_mgr.Size();
-    std::vector<std::string> vec;
-    ini_mgr["Basic"].GetKeyNames(vec);
-    std::cout << ini_mgr.IsSectionExist("Basic") << std::endl;
-    std::cout << ini_mgr.IsSectionExist("Trim") << std::endl;
+    std::vector<std::string> vec_secs;
+    std::vector<std::string> vec_keys;
 
-    double x = ini_mgr["Function"].ToDouble("Idd_Target_1P8V");
-    double y = ini_mgr["Function"].ToDouble("Idd_Limit_1P8V");
+    ini_mgr.GetSectionNames(vec_secs);
 
-    std::cout << "x=" << x << std::endl;
-    std::cout << "y=" << y << std::endl;
-    return 0;
+    for (int i = 0; i < vec_secs.size();i++){
+        std::cout << "[" << vec_secs[i] << "]" << std::endl;
+        ini_mgr[vec_secs[i]].GetKeyNames(vec_keys);
+        for (int j = 0; j < vec_keys.size();j++){
+            std::cout << vec_keys[j] << " = ";
+            std::cout << ini_mgr[vec_secs[i]][vec_keys[j]] << std::endl;
+        }
+        vec_keys.clear();
+    }
+
+        return 0;
 }

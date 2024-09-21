@@ -1,12 +1,27 @@
 #include <iostream>
-#include "./include/ini_manager.h"
+#include <string>
+#include <vector>
+#include "./include/ini_reader.h"
 
 int main(int argc, char* argv[])
 {
-    ini::Section sec("basic", "#first section");
-    sec.AddKey("VDD", "5.0");
-    sec.AddKey("Mag_delay", "10");
+    std::string ini_path = "test\\config file.ini";
+    ini::Ini_Reader ini_mgr(ini_path);
+    ini_mgr.ImportIniFile();
+    std::vector<std::string> vec_secs;
+    std::vector<std::string> vec_keys;
 
-    std::cout << "Hello World" << std::endl;
-    return 0;
+    ini_mgr.GetSectionNames(vec_secs);
+
+    for (int i = 0; i < vec_secs.size();i++){
+        std::cout << "[" << vec_secs[i] << "]" << std::endl;
+        ini_mgr[vec_secs[i]].GetKeyNames(vec_keys);
+        for (int j = 0; j < vec_keys.size();j++){
+            std::cout << vec_keys[j] << " = ";
+            std::cout << ini_mgr[vec_secs[i]][vec_keys[j]] << std::endl;
+        }
+        vec_keys.clear();
+    }
+
+        return 0;
 }
